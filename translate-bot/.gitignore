@@ -1,0 +1,4 @@
+# ignore the guild data/config
+guild_data/*.json
+guild_data/*-wotd.txt
+guild_data/*-wotd.tsv
