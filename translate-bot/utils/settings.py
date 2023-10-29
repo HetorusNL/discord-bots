@@ -19,7 +19,7 @@ class Settings:
                 value = default
             else:
                 # otherwise return the value from defaults
-                value = cls.defaults.get(setting)
+                value = cls.defaults.get(setting, default)
 
         # print(f"[ Settings.get ] ({guild_id}) {setting}: {value}")
         return value

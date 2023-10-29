@@ -417,11 +417,11 @@ async def _admin_command_command_prefix(message: Message, match: Match, guild_id
 
 
 async def _admin_command_server_language(message: Message, match: Match, guild_id: int):
-    language = str(Settings.get(guild_id, "server_language"))
+    language = str(Settings.get(guild_id, "server_language", ""))
     language = _map_cc(language)
     new_language: str = match.groupdict().get("language")  # type:ignore
     if not new_language:  # new_language is either a str, or None
-        await _send_error(message, f"FATAL: _admin_command_server_language, no language in match!")
+        await _handle_server_language(message, language, new_language, guild_id)
         return
     new_language: str = new_language
     new_language = new_language.strip()
