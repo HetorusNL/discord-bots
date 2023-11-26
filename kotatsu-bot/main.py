@@ -189,7 +189,7 @@ async def handle_ship(ctx: Context, *args):
 @bot.event
 async def on_error(event, *args, **kwargs):
     # log the exception to file
-    with open("error.log", "a") as f:
+    with open("data/error.log", "a") as f:
         f.write(f"Unhandled exception: {event} {args}, {kwargs}\n")
 
 

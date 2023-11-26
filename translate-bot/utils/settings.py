@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 
 class Settings:
@@ -49,7 +50,7 @@ class Settings:
         cls.store_settings_file(settings, f"guild_data/{guild_id}.json")
 
     @classmethod
-    def load_settings_file(cls, filename="settings.json"):
+    def load_settings_file(cls, filename="data/settings.json"):
         try:
             # try to open the settings file with fallback to initial values
             with open(filename) as f:
@@ -58,16 +59,18 @@ class Settings:
             print(f"failed to open {filename}, initial values used!")
             settings = {}
             # in case it's the settings.json file, write the default settings file to disk
-            if filename == "settings.json":
+            if filename == "data/settings.json":
+                Path("data").mkdir(exist_ok=True)  # ensure the data directory exists
                 with open(filename, "w") as f:
                     json.dump(settings, f)
 
         return settings
 
     @classmethod
-    def store_settings_file(cls, settings, filename="settings.json", defaults=None):
+    def store_settings_file(cls, settings, filename="data/settings.json", defaults=None):
         defaults = cls.defaults if defaults is None else defaults
         with open(filename, "w") as f:
+            Path(filename).parent.mkdir(exist_ok=True)  # ensure the directory exists
             json.dump({**defaults, **settings}, f, indent=2)
 
     @classmethod

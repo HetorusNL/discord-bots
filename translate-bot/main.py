@@ -481,7 +481,7 @@ async def _admin_command_wotd_language(message: Message, match: Match, guild_id:
                     )
                     await message.channel.send(embed=embed)
                     return
-                src_filename = f"data/wotd-list-" f"{new_wotd_language_from}-{new_wotd_language_to}.tsv"
+                src_filename = f"wotd_data/wotd-list-" f"{new_wotd_language_from}-{new_wotd_language_to}.tsv"
                 if os.path.isfile(src_filename):
                     # remove the (previous) wotd file if available
                     filename = f"guild_data/{guild_id}-wotd.txt"
@@ -530,7 +530,7 @@ async def _admin_command_wotd_language(message: Message, match: Match, guild_id:
                     )
                     await message.channel.send(embed=embed)
                     return
-                src_filename = f"data/wotd-list-{new_wotd_language}.txt"
+                src_filename = f"wotd_data/wotd-list-{new_wotd_language}.txt"
                 if os.path.isfile(src_filename):
                     # remove the (previous) wotd file if available
                     filename = f"guild_data/{guild_id}-wotd.txt"
