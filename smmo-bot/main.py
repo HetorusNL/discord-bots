@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import hashlib
 import os
+from pathlib import Path
 import random
 import re
 import requests
@@ -23,6 +24,9 @@ assert DISCORD_TOKEN, f"FATAL: discord token 'DISCORD_TOKEN' not found in env!"
 assert API_KEY, f"FATAL: SMMO API 'API_KEY' not found in env!"
 assert API_URL_WB, f"FATAL: SMMO API 'API_URL_WB' not found in env!"
 assert DISCORD_GUILD, f"FATAL: discord target guild name 'DISCORD_GUILD' not found in env!"
+
+# make sure that the data directory exists
+Path("data/").mkdir(exist_ok=True)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -87,7 +91,7 @@ def _serialize_to_disk():
         "last_notified_boss": _last_notified_boss,
         "notify_before_sec": _notify_before_sec,
     }
-    with open("db.json", "w") as f:
+    with open("data/db.json", "w") as f:
         json.dump(obj, f)
 
 
@@ -97,15 +101,15 @@ def _unserialize_from_disk():
     global _notify_before_sec
 
     try:
-        with open("db.json", "r") as f:
+        with open("data/db.json", "r") as f:
             json.load(f)
     except:
         # database doesn't exist, create an empty one
         print("ERROR: failed to open db.json!")
         print("resetting database to default...")
-        with open("db.json", "w") as f:
+        with open("data/db.json", "w") as f:
             json.dump({}, f)
-    with open("db.json", "r") as f:
+    with open("data/db.json", "r") as f:
         obj: dict = json.load(f)
         _last_notified_boss = obj.get("last_notified_boss", 0)
         _notify_before_sec = obj.get("notify_before_sec", 0)
@@ -524,7 +528,7 @@ def _wb_generate_msg(wb, wb_is_next, show_info=False):
 @bot.event
 async def on_error(event, *args, **kwargs):
     # log the exception to file
-    with open("error.log", "a") as f:
+    with open("data/error.log", "a") as f:
         f.write(f"Unhandled exception: {event} {args}, {kwargs}\n")
 
 

@@ -1,6 +1,7 @@
 import discord
 import json
 import os
+from pathlib import Path
 
 from discord import Message
 from discord import Member
@@ -14,10 +15,13 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
+# make sure that the data directory exists
+Path("data/").mkdir(exist_ok=True)
+
 # load data from disk
-with open("backup.json", "r") as f:
+with open("data/backup.json", "r") as f:
     server_data: dict = json.load(f)
-with open("help.json", "r") as f:
+with open("data/help.json", "r") as f:
     help_cmds = json.load(f)
 
 # set the command prefix and the bot's status
@@ -40,7 +44,7 @@ async def on_ready():  # setting bot activity
 
 
 async def save_backup():
-    with open("backup.json", "w") as f:  # save to backup.json
+    with open("data/backup.json", "w") as f:  # save to data/backup.json
         json.dump(server_data, f, indent=4)
     return
 
