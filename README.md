@@ -1,5 +1,7 @@
 # Discord Bots
 
+Repository url: https://github.com/HetorusNL/discord-bots
+
 ## Repository information:
 
 This repository contains a collection of discord bots.
