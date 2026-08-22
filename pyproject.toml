@@ -1,23 +1,22 @@
-[tool.black]
-line-length = 119
-
-[tool.poetry]
+[project]
 name = "discord-bots"
 version = "0.1.0"
 description = "Python discord bots"
-authors = ["Tim Klein Nijenhuis <tim@hetorus.nl>"]
+authors = [{"name" = "Tim Klein Nijenhuis", "email" = "tim@hetorus.nl"}]
 license = "MIT"
 readme = "README.md"
+requires-python = ">=3.12,<3.13"
 packages = []
+dependencies = [
+    "discord-py>=2.7.1",
+    "requests>=2.34.2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-discord-py = "^2.3.2"
-requests = "^2.31.0"
+[tool.black]
+line-length = 120
 
-[tool.poetry.group.dev.dependencies]
-black = "^23.7.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-watcher>=0.6.3",
+]

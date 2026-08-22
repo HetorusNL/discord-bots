@@ -350,12 +350,12 @@ async def _translate(message: Message, src, dst, text):
 
 
 async def _command_wotd(message: Message, match: Match, guild_id: int):
-    channel: TextChannel = message.channel  # type:ignore
+    channel: TextChannel = message.channel  # type: ignore
     await _generate_wotd(guild_id, force=True, msg_channel=channel)
 
 
 async def _command_wotd_words_left(message: Message, match: Match, guild_id: int):
-    channel: TextChannel = message.channel  # type:ignore
+    channel: TextChannel = message.channel  # type: ignore
     if not await _verify_wotd_requirements(guild_id, channel):
         # no wotd channel or languageconfigured, return
         return
@@ -419,7 +419,7 @@ async def _admin_command_command_prefix(message: Message, match: Match, guild_id
 async def _admin_command_server_language(message: Message, match: Match, guild_id: int):
     language = str(Settings.get(guild_id, "server_language", ""))
     language = _map_cc(language)
-    new_language: str = match.groupdict().get("language")  # type:ignore
+    new_language: str = match.groupdict().get("language")  # type: ignore
     if not new_language:  # new_language is either a str, or None
         await _handle_server_language(message, language, new_language, guild_id)
         return
@@ -819,7 +819,7 @@ async def _generate_wotd(guild_id: int, force=False, msg_channel: TextChannel | 
         if msg_channel:
             await msg_channel.send(embed=embed)
         return
-    channel: TextChannel = guild.get_channel(int(str(Settings.get(guild_id, "wotd_channel"))))  # type:ignore
+    channel: TextChannel = guild.get_channel(int(str(Settings.get(guild_id, "wotd_channel"))))  # type: ignore
     if not channel:
         embed = discord.Embed(
             title=f"WOTD language",
