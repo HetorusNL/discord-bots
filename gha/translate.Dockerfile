@@ -23,6 +23,7 @@ RUN \
     mv src-mount/* /src/;
 
 # add/update the container labels
+ARG VCS_REF
 LABEL org.label-schema.vcs-ref=$VCS_REF
 LABEL org.label-schema.vcs-url=https://github.com/HetorusNL/discord-bots
 LABEL org.opencontainers.image.authors=tim@hetorus.nl
