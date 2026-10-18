@@ -16,13 +16,46 @@ intents.message_content = True
 intents.members = True
 
 # make sure that the data directory exists
-Path("data/").mkdir(exist_ok=True)
+DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR.mkdir(exist_ok=True)
+
+BACKUP_PATH = DATA_DIR / "backup.json"
+HELP_PATH = DATA_DIR / "help.json"
 
 # load data from disk
-with open("data/backup.json", "r") as f:
-    server_data: dict = json.load(f)
-with open("data/help.json", "r") as f:
-    help_cmds = json.load(f)
+server_data: dict = {}
+if BACKUP_PATH.exists():
+    try:
+        with open(BACKUP_PATH, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+        if not content:
+            print(f"Warning: {BACKUP_PATH} is empty; starting with empty server data")
+            server_data = {}
+        else:
+            server_data = json.loads(content) or {}
+    except (json.JSONDecodeError, OSError, ValueError) as e:
+        print(f"Warning: failed to load {BACKUP_PATH}: {e}; starting with empty server data")
+        server_data = {}
+
+help_cmds: dict = {}
+if HELP_PATH.exists():
+    try:
+        with open(HELP_PATH, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+        if not content:
+            print(f"Warning: {HELP_PATH} is empty; starting with empty help commands")
+            help_cmds = {}
+        else:
+            help_cmds = json.loads(content) or {}
+    except (json.JSONDecodeError, OSError, ValueError) as e:
+        print(f"Warning: failed to load {HELP_PATH}: {e}; starting with empty help commands")
+        help_cmds = {}
+
+# normalize help_cmds
+if not isinstance(help_cmds, dict):
+    help_cmds = {}
+help_cmds.setdefault("member", [])
+help_cmds.setdefault("admin", [])
 
 # set the command prefix and the bot's status
 command_prefix = "s!"
@@ -44,14 +77,21 @@ async def on_ready():  # setting bot activity
 
 
 async def save_backup():
-    with open("data/backup.json", "w") as f:  # save to data/backup.json
+    with open(BACKUP_PATH, "w", encoding="utf-8") as f:  # save to data/backup.json
         json.dump(server_data, f, indent=4)
     return
 
 
 async def strip_duplicates(guild_id: str):
-    server_data[guild_id]["whitelist"] = list(set(server_data[guild_id]["whitelist"]))
-    server_data[guild_id]["flagged_words"] = list(set(server_data[guild_id]["flagged_words"]))
+    g = server_data.get(guild_id)
+    if not isinstance(g, dict):
+        return
+    wl = g.get("whitelist")
+    if isinstance(wl, list):
+        g["whitelist"] = list(set(wl))
+    fw = g.get("flagged_words")
+    if isinstance(fw, list):
+        g["flagged_words"] = list(set(fw))
 
 
 async def send_report(message: Message, report):
@@ -87,7 +127,19 @@ async def on_member_join(member: Member):
 
     guild_id = str(member.guild.id)  # convert guild id to string for json file
 
-    if not server_data[guild_id]["autorole"]:  # return if autorole disabled (if autorole == None)
+    if guild_id not in server_data or not isinstance(server_data[guild_id], dict):
+        server_data[guild_id] = {
+            "report": None,
+            "admin": None,
+            "whitelist": [],
+            "flagged_words": [],
+            "autorole": None,
+        }
+    else:
+        g = server_data[guild_id]
+        g.setdefault("autorole", None)
+
+    if not server_data[guild_id].get("autorole"):  # return if autorole disabled (if autorole == None)
         return
 
     # add role to new user
@@ -115,10 +167,32 @@ async def on_message(message: Message):
     user_can_manage_messages = message.channel.permissions_for(message.author).manage_messages
 
     # check if guild added to server_data
-    if guild_id not in server_data.keys():
-        server_data[guild_id] = {}
-
+    if guild_id not in server_data:
+        server_data[guild_id] = {
+            "report": None,
+            "admin": None,
+            "whitelist": [],
+            "flagged_words": [],
+            "autorole": None,
+        }
         await save_backup()
+    else:
+        g = server_data[guild_id]
+        if not isinstance(g, dict):
+            server_data[guild_id] = {
+                "report": None,
+                "admin": None,
+                "whitelist": [],
+                "flagged_words": [],
+                "autorole": None,
+            }
+            await save_backup()
+        else:
+            g.setdefault("report", None)
+            g.setdefault("admin", None)
+            g.setdefault("whitelist", [])
+            g.setdefault("flagged_words", [])
+            g.setdefault("autorole", None)
 
     # commands
     if message.content.startswith(command_prefix):
